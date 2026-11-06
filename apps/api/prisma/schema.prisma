@@ -1,3 +1,9 @@
+// Author: Guillermina Gatti
+// Summary: Prisma schema. Adds the chunks model for document processing (HU14).
+// Each team adds its own models in its own PR, following the table contract
+// (team A: users, areas, ...; team B: procedures, ...; team C: documents, chunks, ...).
+// The vector extension is already created by docker/postgres/init.sql.
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -7,6 +13,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Each team adds its own models in its own PR, following the table contract
-// (team A: users, areas, ...; team B: procedures, ...; team C: documents, chunks, ...).
-// The vector extension is already created by docker/postgres/init.sql.
+model Chunk {
+  id                String   @id @default(uuid()) @db.Uuid
+  documentVersionId String   @db.Uuid
+  order             Int
+  section           String
+  content           String
+  embedding         Unsupported("vector(768)")
+  areaIds           String[] @db.Uuid
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+
+  @@index([documentVersionId])
+  @@map("chunks")
+}
